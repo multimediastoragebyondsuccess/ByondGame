@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6 RODA EMPIRE — Byond Success</title>
+<style>
+:root{
+  --bg:#0B0B0D; --panel:#141417; --panel2:#1B1B1F; --line:#2A2A30;
+  --yellow:#FFC400; --yellow-dim:#8a6a00; --amber:#FF9F1C;
+  --txt:#EDEDEF; --mut:#8E8E96;
+  --good:#3DDC84; --bad:#FF4D5E; --info:#4DA3FF;
+  --radius:12px;
+  --display:'Bebas Neue','Arial Narrow',Impact,sans-serif;
+  --body:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:var(--body);font-size:14px;line-height:1.45;
+  background-image:radial-gradient(ellipse 900px 480px at 50% -10%, rgba(255,196,0,.06), transparent);}
+button{font-family:var(--body);cursor:pointer;border:none;border-radius:8px;color:var(--txt)}
+button:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+.app{max-width:1480px;margin:0 auto;padding:14px 18px 90px}
+
+/* ===== HEADER ===== */
+header{display:flex;align-items:center;gap:18px;padding:10px 16px;background:var(--panel);
+  border:1px solid var(--line);border-radius:var(--radius);position:sticky;top:8px;z-index:40;
+  box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.logo{font-family:var(--display);font-size:30px;letter-spacing:2px;color:var(--yellow);line-height:1;white-space:nowrap}
+.logo span{color:var(--txt)}
+.kpis{display:flex;gap:8px;flex:1;flex-wrap:wrap;justify-content:flex-end}
+.kpi{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:5px 12px;min-width:108px}
+.kpi .l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--mut)}
+.kpi .v{font-family:var(--display);font-size:20px;letter-spacing:1px}
+.kpi .v.cash{color:var(--yellow)}
+.kpi .v.neg{color:var(--bad)}
+.kpi .v.pos{color:var(--good)}
+
+/* ===== LAYOUT ===== */
+.grid{display:grid;grid-template-columns:430px 1fr;gap:14px;margin-top:14px}
+@media(max-width:1080px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+.card h2{font-family:var(--display);font-size:20px;letter-spacing:2px;color:var(--yellow);margin-bottom:8px}
+.card h2 small{color:var(--mut);font-family:var(--body);font-size:11px;letter-spacing:0;text-transform:none;font-weight:400;margin-left:8px}
+
+/* ===== WHEEL ===== */
+#wheelWrap{display:flex;flex-direction:column;align-items:center}
+#wheelSvg{width:100%;max-width:400px}
+.balanceBadge{margin-top:6px;padding:6px 16px;border-radius:999px;font-family:var(--display);font-size:18px;letter-spacing:2px;border:1px solid var(--line)}
+.balanceBadge.ok{background:rgba(61,220,132,.12);color:var(--good);border-color:rgba(61,220,132,.4)}
+.balanceBadge.mid{background:rgba(255,196,0,.1);color:var(--yellow);border-color:rgba(255,196,0,.35)}
+.balanceBadge.bad{background:rgba(255,77,94,.12);color:var(--bad);border-color:rgba(255,77,94,.4);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+@media(prefers-reduced-motion:reduce){.balanceBadge.bad{animation:none}}
+.weakNote{font-size:12px;color:var(--mut);margin-top:6px;text-align:center;min-height:18px}
+
+/* ===== TABS ===== */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{background:var(--panel2);border:1px solid var(--line);padding:8px 16px;border-radius:8px;color:var(--mut);
+  font-family:var(--display);font-size:16px;letter-spacing:1.5px}
+.tab.active{background:var(--yellow);color:#111;border-color:var(--yellow)}
+.tabPane{display:none}
+.tabPane.active{display:block}
+
+/* ===== DEPARTMENTS ===== */
+.deptGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.dept{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;border-left:3px solid var(--yellow-dim)}
+.dept.weakest{border-left-color:var(--bad)}
+.dept .dh{display:flex;justify-content:space-between;align-items:baseline}
+.dept .dname{font-family:var(--display);font-size:19px;letter-spacing:1.5px}
+.dept .dlvl{color:var(--yellow);font-family:var(--display);font-size:17px}
+.bar{height:7px;background:#0e0e10;border-radius:99px;overflow:hidden;margin:3px 0 7px;border:1px solid #222}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--yellow);transition:width .4s}
+.bar.h i{background:var(--good)}
+.bar.low i{background:var(--bad)}
+.dept .meta{font-size:11px;color:var(--mut);display:flex;justify-content:space-between;margin-bottom:2px}
+.dept .acts{display:flex;gap:6px;margin-top:8px}
+.btn{background:var(--panel);border:1px solid var(--line);padding:6px 10px;border-radius:7px;font-size:12px}
+.btn:hover{border-color:var(--yellow)}
+.btn.gold{background:var(--yellow);color:#111;font-weight:700;border-color:var(--yellow)}
+.btn.gold:hover{background:#ffd333}
+.btn.red{border-color:rgba(255,77,94,.5);color:var(--bad)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ===== STAFF ===== */
+.empGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.emp{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px}
+.emp .eh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.emp .nm{font-weight:700;font-size:15px}
+.emp .rl{font-size:11px;color:var(--yellow);text-transform:uppercase;letter-spacing:1px}
+.emp .stats{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;font-size:11.5px;color:var(--mut)}
+.emp .stats b{color:var(--txt);font-weight:600}
+.emp .warn{color:var(--bad);font-size:11px;margin-top:5px}
+.empty{color:var(--mut);padding:24px;text-align:center;border:1px dashed var(--line);border-radius:10px}
+
+/* ===== MISC ===== */
+.feed{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+.feed div{font-size:12px;padding:6px 9px;background:var(--panel2);border-radius:7px;border-left:2px solid var(--line)}
+.feed div.good{border-left-color:var(--good)}
+.feed div.bad{border-left-color:var(--bad)}
+.feed div.gold{border-left-color:var(--yellow)}
+.feed .m{color:var(--mut);margin-right:6px;font-size:10px}
+.alerts{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.alert{padding:8px 12px;border-radius:8px;font-size:12.5px;background:rgba(255,77,94,.1);border:1px solid rgba(255,77,94,.35);color:#ffb3ba}
+.alert.y{background:rgba(255,196,0,.08);border-color:rgba(255,196,0,.3);color:#ffe28a}
+
+/* ===== NEXT MONTH BAR ===== */
+.actionBar{position:fixed;bottom:0;left:0;right:0;background:rgba(11,11,13,.92);backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);padding:12px 18px;display:flex;justify-content:center;gap:14px;z-index:50;align-items:center}
+#nextBtn{font-family:var(--display);font-size:24px;letter-spacing:3px;padding:10px 60px;background:var(--yellow);color:#111;border-radius:10px;
+  box-shadow:0 0 28px rgba(255,196,0,.35)}
+#nextBtn:hover{background:#ffd333}
+.smallNote{color:var(--mut);font-size:11px}
+
+/* ===== MODAL ===== */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}
+.overlay.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:600px;width:100%;padding:22px;max-height:88vh;overflow-y:auto;
+  box-shadow:0 0 60px rgba(255,196,0,.12)}
+.modal .tag{display:inline-block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--yellow);border:1px solid rgba(255,196,0,.4);
+  padding:3px 10px;border-radius:99px;margin-bottom:10px}
+.modal h3{font-family:var(--display);font-size:28px;letter-spacing:2px;margin-bottom:8px}
+.modal p{color:#c9c9cf;margin-bottom:14px;white-space:pre-line}
+.modal .opts{display:flex;flex-direction:column;gap:8px}
+.optBtn{text-align:left;background:var(--panel2);border:1px solid var(--line);padding:12px 14px;border-radius:9px;font-size:13.5px}
+.optBtn:hover{border-color:var(--yellow);background:#202024}
+.optBtn small{display:block;color:var(--mut);font-size:11.5px;margin-top:2px}
+.report table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:10px}
+.report td{padding:5px 4px;border-bottom:1px solid var(--line)}
+.report td:last-child{text-align:right;font-family:var(--display);font-size:16px;letter-spacing:1px}
+.r-good{color:var(--good)} .r-bad{color:var(--bad)} .r-gold{color:var(--yellow)}
+
+/* ===== MISSION ===== */
+.phases{display:flex;flex-direction:column;gap:10px}
+.phase{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px}
+.phase .ph{display:flex;justify-content:space-between;font-family:var(--display);font-size:18px;letter-spacing:1.5px}
+.phase.locked{opacity:.45}
+.phase.done{border-color:rgba(61,220,132,.5)}
+.phase.done .ph span:last-child{color:var(--good)}
+
+/* toast */
+#toasts{position:fixed;top:80px;right:18px;display:flex;flex-direction:column;gap:8px;z-index:120}
+.toast{background:var(--panel);border:1px solid var(--yellow);border-left:4px solid var(--yellow);padding:10px 16px;border-radius:9px;
+  font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.6);animation:slideIn .3s ease}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+
+/* win/lose */
+#endScreen{position:fixed;inset:0;background:rgba(5,5,6,.96);z-index:200;display:none;align-items:center;justify-content:center;text-align:center;padding:20px}
+#endScreen.show{display:flex}
+#endScreen .inner h1{font-family:var(--display);font-size:64px;letter-spacing:6px;color:var(--yellow)}
+#endScreen .inner p{color:#c9c9cf;max-width:520px;margin:14px auto 22px;white-space:pre-line}
+.upgRow{display:flex;justify-content:space-between;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-bottom:7px;gap:10px}
+.upgRow .ui-n{font-weight:700;font-size:13px}
+.upgRow .ui-d{font-size:11.5px;color:var(--mut)}
+.owned{color:var(--good);font-size:12px;font-weight:700;white-space:nowrap}
+.finRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+input[type=number]{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:7px;padding:7px 10px;width:140px;font-size:13px}
+input[type=number]:focus-visible{outline:2px solid var(--yellow)}
+.hint{font-size:11.5px;color:var(--mut);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">6 RODA <span>EMPIRE</span></div>
+    <div class="kpis">
+      <div class="kpi"><div class="l">Bulan</div><div class="v" id="kMonth">1</div></div>
+      <div class="kpi"><div class="l">Cash</div><div class="v cash" id="kCash">RM 5,000</div></div>
+      <div class="kpi"><div class="l">Revenue (bln lepas)</div><div class="v" id="kRev">—</div></div>
+      <div class="kpi"><div class="l">Profit (bln lepas)</div><div class="v" id="kProfit">—</div></div>
+      <div class="kpi"><div class="l">Reputasi</div><div class="v" id="kRep">10</div></div>
+      <div class="kpi"><div class="l">Staf</div><div class="v" id="kStaff">0</div></div>
+      <div class="kpi"><div class="l">Pejabat</div><div class="v" id="kStage" style="font-size:14px;padding-top:3px">Home Office</div></div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div>
+      <div class="card" id="wheelWrap">
+        <h2>6 RODA PENGURUSAN <small>syarikat hanya sekuat roda paling lemah</small></h2>
+        <svg id="wheelSvg" viewBox="0 0 420 420" role="img" aria-label="Carta keseimbangan 6 jabatan"></svg>
+        <div class="balanceBadge mid" id="balBadge">—</div>
+        <div class="weakNote" id="weakNote"></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h2>LIVE FEED</h2>
+        <div class="alerts" id="alerts"></div>
+        <div class="feed" id="feed"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="tabs">
+        <button class="tab active" data-tab="dept">JABATAN</button>
+        <button class="tab" data-tab="staff">STAF</button>
+        <button class="tab" data-tab="hire">HIRING</button>
+        <button class="tab" data-tab="upg">TOOLS</button>
+        <button class="tab" data-tab="fin">KEWANGAN</button>
+        <button class="tab" data-tab="mission">MISI RM4J</button>
+      </div>
+
+      <div class="card tabPane active" id="pane-dept">
+        <h2>JABATAN <small>upgrade level &amp; jaga keseimbangan</small></h2>
+        <div class="deptGrid" id="deptGrid"></div>
+      </div>
+
+      <div class="card tabPane" id="pane-staff">
+        <h2>STAF <small id="staffCapNote"></small></h2>
+        <div class="empGrid" id="empGrid"></div>
+      </div>
+
+      <div class="card tabPane" id="pane-hire">
+        <h2>HIRING MARKET <small>calon refresh setiap bulan</small></h2>
+        <div class="empGrid" id="hireGrid"></div>
+        <div class="finRow" style="margin-top:12px">
+          <button class="btn" id="refreshCand">Post Job Ad — RM300 (refresh calon)</button>
+        </div>
+      </div>
+
+      <div class="card tabPane" id="pane-upg">
+        <h2>TOOLS &amp; SISTEM <small>unlock ikut level jabatan</small></h2>
+        <div id="upgList"></div>
+      </div>
+
+      <div class="card tabPane" id="pane-fin">
+        <h2>KEWANGAN</h2>
+        <div class="report" id="finReport"></div>
+        <h2 style="margin-top:14px">ZAKAT &amp; SEDEKAH</h2>
+        <div class="finRow">
+          <input type="number" id="zakatAmt" min="100" step="100" placeholder="Jumlah RM">
+          <button class="btn gold" id="payZakat">Bayar Zakat</button>
+          <button class="btn" id="payCharity">Beri Sedekah</button>
+        </div>
+        <div class="hint">Zakat &amp; sedekah naikkan reputasi + morale team. Phase 3 &amp; 4 perlukan RM1,000,000 setiap satu.</div>
+        <h2 style="margin-top:14px">PEJABAT</h2>
+        <div id="officePanel"></div>
+      </div>
+
+      <div class="card tabPane" id="pane-mission">
+        <h2>MISI: 4 X RM1,000,000</h2>
+        <div class="phases" id="phaseList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="actionBar">
+  <button class="btn" id="newGameBtn">New Game</button>
+  <button id="nextBtn">TUTUP BULAN ▶</button>
+  <div class="smallNote">Auto-save (LocalStorage)</div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+<div id="toasts"></div>
+<div id="endScreen"><div class="inner">
+  <h1 id="endTitle"></h1><p id="endDesc"></p>
+  <button class="btn gold" style="font-size:16px;padding:12px 30px" onclick="resetGame()">MULA SEMULA</button>
+</div></div>
+<script>
+/* ============================================================
+   6 RODA EMPIRE — Byond Success
+   Single-file business sim. No backend. LocalStorage only.
+   ============================================================ */
+"use strict";
+
+/* ---------- STATIC DATA ---------- */
+const DEPTS = ["admin","sales","marketing","operation","finance","hr"];
+const DEPT_LABEL = {admin:"ADMIN",sales:"SALES",marketing:"MARKETING",operation:"OPERATION",finance:"FINANCE",hr:"HR"};
+const DEPT_DESC = {
+  admin:"Sistem & organisasi", sales:"Conversion rate", marketing:"Lead generation",
+  operation:"Kualiti delivery", finance:"Cashflow & kawalan kos", hr:"Retention & morale"
+};
+
+const NAMES = ["Ali","Siti","Aiman","Farah","Hafiz","Nurul","Daniel","Mei Ling","Kumar","Aisyah","Zul","Syafiq","Amirah","Jason","Priya","Faiz","Izzati","Adam","Alia","Haziq","Sofea","Irfan","Balqis","Wei Jian","Thinesh","Nadia","Akmal","Hannah","Ridzuan","Liyana","Megat","Qistina","Harith","Yuna","Shafiq","Dayang","Arif","Melati","Iqbal","Zara"];
+
+const TIERS = {
+  junior:   {label:"Junior",    sal:[1400,2100],  skill:[28,48], hireFee:500},
+  exec:     {label:"Executive", sal:[2900,4200],  skill:[45,66], hireFee:1200},
+  manager:  {label:"Manager",   sal:[5200,8500],  skill:[62,84], hireFee:3500},
+  director: {label:"Director",  sal:[10500,16500],skill:[78,96], hireFee:9000}
+};
+
+const STAGES = [
+  null,
+  {name:"Home Office",     rent:0,     cap:3,   dealMult:1.0, cost:0},
+  {name:"Small Office",    rent:2200,  cap:10,  dealMult:1.5, cost:15000},
+  {name:"Company Office",  rent:6500,  cap:25,  dealMult:2.2, cost:60000},
+  {name:"Multi-floor HQ",  rent:18000, cap:60,  dealMult:3.5, cost:250000},
+  {name:"Corporate Tower", rent:60000, cap:150, dealMult:5.5, cost:1200000}
+];
+
+const UPGRADES = [
+  {id:"fbads",   dept:"marketing", name:"Facebook Ads",        cost:3000,  upkeep:800,  req:1, desc:"Leads +30%", mods:{leadsMult:1.30}},
+  {id:"tiktok",  dept:"marketing", name:"TikTok Ads",          cost:8000,  upkeep:2000, req:3, desc:"Leads +50%", mods:{leadsMult:1.50}},
+  {id:"funnel",  dept:"marketing", name:"Funnel System",       cost:15000, upkeep:600,  req:5, desc:"Leads +20%, Conversion +10%", mods:{leadsMult:1.20, convMult:1.10}},
+  {id:"mktauto", dept:"marketing", name:"Marketing Automation",cost:40000, upkeep:1200, req:9, desc:"Leads +60%, eff jabatan stabil", mods:{leadsMult:1.60, effFloor:true}},
+  {id:"crm",     dept:"sales",     name:"CRM",                 cost:5000,  upkeep:500,  req:2, desc:"Conversion +15%", mods:{convMult:1.15}},
+  {id:"script",  dept:"sales",     name:"Sales Scripts",       cost:2000,  upkeep:0,    req:1, desc:"Conversion +10%", mods:{convMult:1.10}},
+  {id:"callctr", dept:"sales",     name:"Call Center",         cost:35000, upkeep:5000, req:8, desc:"Conversion +25% (perlu Stage 3 office)", mods:{convMult:1.25}, reqStage:3},
+  {id:"sop",     dept:"operation", name:"SOP Lengkap",         cost:4000,  upkeep:0,    req:2, desc:"Refund rate -30%", mods:{refundMult:0.70}},
+  {id:"qa",      dept:"operation", name:"QA System",           cost:12000, upkeep:700,  req:5, desc:"Refund -40%, satisfaction +8", mods:{refundMult:0.60, satFlat:8}},
+  {id:"opsauto", dept:"operation", name:"Ops Automation",      cost:50000, upkeep:1500, req:9, desc:"Deal value +15%, health stabil", mods:{dealMult:1.15, effFloor:true}},
+  {id:"budget",  dept:"finance",   name:"Budgeting System",    cost:3000,  upkeep:0,    req:1, desc:"Kos misc -15%", mods:{miscMult:0.85}},
+  {id:"forecast",dept:"finance",   name:"Forecasting",         cost:10000, upkeep:400,  req:4, desc:"Kos misc -25%, amaran awal cashflow", mods:{miscMult:0.75}},
+  {id:"training",dept:"hr",        name:"Training Program",    cost:6000,  upkeep:600,  req:2, desc:"Staf naik skill 2x lebih laju", mods:{trainMult:2}},
+  {id:"review",  dept:"hr",        name:"Performance Review",  cost:9000,  upkeep:300,  req:4, desc:"Morale lebih stabil, resign turun", mods:{moraleStab:true}},
+  {id:"meeting", dept:"admin",     name:"Meeting System",      cost:2000,  upkeep:0,    req:1, desc:"Eff decay semua jabatan -50%", mods:{decayMult:0.5}},
+  {id:"docs",    dept:"admin",     name:"Documentation",       cost:7000,  upkeep:200,  req:3, desc:"Eff semua jabatan +5", mods:{effAll:5}},
+  {id:"workflow",dept:"admin",     name:"Workflow Management", cost:20000, upkeep:800,  req:6, desc:"Bonus keseimbangan lebih mudah dapat", mods:{balanceEase:true}}
+];
+
+/* Scheduled effect mods supported: leadsMult, convMult, dealMult, repPerMonth, expFlat, moraleAll(once applied at creation) */
+const DECISIONS = [
+  {id:"d_tiktok", title:"Cadangan: TikTok Ads Blast", who:"Marketing Manager",
+   desc:"\"Boss, saya nak run TikTok ads campaign besar-besaran bulan depan. Budget RM10,000. Confident leads naik gila.\"",
+   opts:[
+     {label:"Approve penuh — RM10,000", cost:10000, fx:s=>{addEffect(s,"TikTok Campaign",3,{leadsMult:1.55});}},
+     {label:"Kurangkan budget — RM4,000", cost:4000, fx:s=>{addEffect(s,"TikTok Campaign (kecil)",3,{leadsMult:1.2});}},
+     {label:"Reject. Bukan masa sekarang.", cost:0, fx:s=>{moraleDept(s,"marketing",-5); log(s,"Team marketing nampak demotivated sikit.","bad");}}
+   ]},
+  {id:"d_training", title:"Cadangan: Sales Bootcamp", who:"Sales Lead",
+   desc:"\"Closing rate kita boleh lagi tinggi boss. Saya jumpa trainer power, RM5,000 untuk 2 hari bootcamp.\"",
+   opts:[
+     {label:"Approve — RM5,000", cost:5000, fx:s=>{addEffect(s,"Sales Bootcamp",4,{convMult:1.22}); moraleDept(s,"sales",6);}},
+     {label:"Reject", cost:0, fx:s=>{}}
+   ]},
+  {id:"d_teambuild", title:"Cadangan: Team Building", who:"HR",
+   desc:"\"Team dah nampak penat boss. Trip team building ke Janda Baik, RM3,000 semua sekali.\"",
+   opts:[
+     {label:"Approve — RM3,000", cost:3000, fx:s=>{moraleAll(s,14); stressAll(s,-15); log(s,"Team building best! Morale semua naik.","good");}},
+     {label:"Reject. Kerja dulu.", cost:0, fx:s=>{moraleAll(s,-4);}}
+   ]},
+  {id:"d_pr", title:"Cadangan: PR Agency", who:"Marketing",
+   desc:"\"Ada PR agency offer package media coverage + press release. RM8,000. Bagus untuk brand.\"",
+   opts:[
+     {label:"Approve — RM8,000", cost:8000, fx:s=>{addEffect(s,"PR Coverage",3,{repPerMonth:3});}},
+     {label:"Reject", cost:0, fx:s=>{}}
+   ]},
+  {id:"d_price", title:"Keputusan: Naikkan Harga?", who:"Finance",
+   desc:"\"Margin kita tipis boss. Saya cadang naikkan harga 15%. Risiko: conversion mungkin turun sikit.\"",
+   opts:[
+     {label:"Naikkan harga 15%", cost:0, fx:s=>{addEffect(s,"Harga Premium",6,{dealMult:1.15, convMult:0.93});}},
+     {label:"Kekalkan harga", cost:0, fx:s=>{}}
+   ]},
+  {id:"d_coffee", title:"Cadangan: Pantry Upgrade", who:"Admin",
+   desc:"\"Boss, coffee machine + pantry restock. RM1,500. Benda kecil tapi staf happy.\"",
+   opts:[
+     {label:"Approve — RM1,500", cost:1500, fx:s=>{moraleAll(s,6);}},
+     {label:"Reject", cost:0, fx:s=>{}}
+   ]},
+  {id:"d_sponsor", title:"Cadangan: Sponsor Event Komuniti", who:"Marketing",
+   desc:"\"Ada event usahawan lokal cari sponsor. RM6,000. Booth + logo + exposure.\"",
+   opts:[
+     {label:"Approve — RM6,000", cost:6000, fx:s=>{s.rep=clamp(s.rep+6,0,100); addEffect(s,"Event Buzz",2,{leadsMult:1.25});}},
+     {label:"Reject", cost:0, fx:s=>{}}
+   ]},
+  {id:"d_consult", title:"Cadangan: Business Consultant", who:"Admin",
+   desc:"\"Consultant offer audit jabatan paling lemah kita dan fix sistem dia. RM7,000.\"",
+   opts:[
+     {label:"Approve — RM7,000", cost:7000, fx:s=>{const w=weakestDept(s); s.depts[w].eff=clamp(s.depts[w].eff+18,10,100); s.depts[w].health=clamp(s.depts[w].health+15,0,100); log(s,`Consultant dah fix jabatan ${DEPT_LABEL[w]}. Eff +18.`,"good");}},
+     {label:"Reject", cost:0, fx:s=>{}}
+   ]},
+  {id:"d_overtime", title:"Keputusan: Push Overtime?", who:"Operation",
+   desc:"\"Order tengah banyak. Kalau team push OT sebulan, kita boleh deliver lebih. Tapi team akan penat.\"",
+   opts:[
+     {label:"Push OT (revenue +15% bulan depan)", cost:0, fx:s=>{addEffect(s,"OT Push",1,{dealMult:1.15}); stressAll(s,16);}},
+     {label:"Tak payah. Jaga team.", cost:0, fx:s=>{moraleAll(s,3);}}
+   ]},
+  {id:"d_kenduri", title:"Cadangan: Kenduri Kesyukuran Office", who:"HR",
+   desc:"\"Boss, dah lama tak buat makan-makan. Kenduri kecil + jemput jiran office. RM2,000.\"",
+   opts:[
+     {label:"Approve — RM2,000", cost:2000, fx:s=>{moraleAll(s,8); s.rep=clamp(s.rep+2,0,100);}},
+     {label:"Reject", cost:0, fx:s=>{}}
+   ]},
+  {id:"d_stock", title:"Cadangan: Bulk Inventory Deal", who:"Operation",
+   desc:"\"Supplier bagi harga borong kalau kita amik stok besar sekarang. RM12,000 upfront, margin naik 3 bulan.\"",
+   opts:[
+     {label:"Approve — RM12,000", cost:12000, fx:s=>{addEffect(s,"Margin Borong",3,{dealMult:1.12});}},
+     {label:"Reject", cost:0, fx:s=>{}}
+   ]},
+  {id:"d_intern", title:"Cadangan: Program Internship", who:"HR",
+   desc:"\"Universiti berdekatan tawarkan program intern. RM1,000 setup. Intern boleh support jabatan lemah.\"",
+   opts:[
+     {label:"Approve — RM1,000", cost:1000, fx:s=>{const w=weakestDept(s); s.depts[w].eff=clamp(s.depts[w].eff+8,10,100); log(s,`Intern membantu jabatan ${DEPT_LABEL[w]}.`,"good");}},
+     {label:"Reject", cost:0, fx:s=>{}}
+   ]}
+];
+
+const EVENTS = [
+  {id:"e_fbban", title:"Akaun Facebook Ads Kena Ban!", w:1,
+   desc:"Ad account utama kena disable tanpa amaran. Semua campaign terhenti serta-merta.",
+   opts:[
+     {label:"Lantik agency appeal + setup backup account — RM4,000", cost:4000, fx:s=>{addEffect(s,"Recovery Ads",1,{leadsMult:0.85}); log(s,"Account recovery dalam proses. Impak minimum.","good");}},
+     {label:"Biarkan, fokus organic dulu", cost:0, fx:s=>{addEffect(s,"Ads Down",2,{leadsMult:0.55}); log(s,"Leads jatuh teruk 2 bulan.","bad");}}
+   ]},
+  {id:"e_viral", title:"Komplen Customer Viral di TikTok!", w:1,
+   desc:"Seorang customer post video komplen pasal delivery lambat. 300k views dan naik lagi.",
+   opts:[
+     {label:"Respond secara terbuka + refund + hadiah — RM3,000", cost:3000, fx:s=>{s.rep=clamp(s.rep+4,0,100); log(s,"Handle dengan baik. Netizen puji response company.","good");}},
+     {label:"Senyap, harap reda sendiri", cost:0, fx:s=>{s.rep=clamp(s.rep-12,0,100); addEffect(s,"Trust Issue",2,{convMult:0.85}); log(s,"Isu makin besar. Reputasi terjejas.","bad");}}
+   ]},
+  {id:"e_supplier", title:"Supplier Naikkan Harga 20%", w:1, minStage:2,
+   desc:"Supplier utama hantar notis kenaikan harga berkuatkuasa segera.",
+   opts:[
+     {label:"Cari supplier baru — RM2,500 kos transition", cost:2500, fx:s=>{log(s,"Supplier baru secured. Kos kekal.","good");}},
+     {label:"Terima kenaikan", cost:0, fx:s=>{addEffect(s,"Kos Supplier Naik",4,{expFlat:1500}); log(s,"Kos operasi naik RM1,500/bulan selama 4 bulan.","bad");}}
+   ]},
+  {id:"e_audit", title:"Tax Audit LHDN", w:0.7, minStage:2,
+   desc:"LHDN pilih syarikat anda untuk audit. Rekod kewangan akan diperiksa.",
+   opts:[
+     {label:"Lantik tax agent — RM5,000", cost:5000, fx:s=>{if(s.depts.finance.lvl>=4){log(s,"Audit clear. Rekod kemas sebab Finance kuat.","good"); s.rep=clamp(s.rep+3,0,100);}else{log(s,"Audit clear dengan bantuan agent.","good");}}},
+     {label:"Handle sendiri", cost:0, fx:s=>{if(s.depts.finance.lvl>=5){log(s,"Finance team handle dengan cemerlang!","good");}else{const p=Math.round(2000+Math.random()*6000); s.cash-=p; log(s,`Penalti & adjustment: RM${fmt(p)}. Finance lemah ada harga.`,"bad");}}}
+   ]},
+  {id:"e_flood", title:"Office Banjir Kilat!", w:0.7, minStage:2,
+   desc:"Hujan lebat semalaman. Air masuk office, beberapa equipment rosak.",
+   opts:[
+     {label:"Repair segera — RM3,500", cost:3500, fx:s=>{log(s,"Office pulih dalam seminggu.","good");}},
+     {label:"Repair minimum — RM1,000", cost:1000, fx:s=>{DEPTS.forEach(d=>s.depts[d].eff=clamp(s.depts[d].eff-6,10,100)); log(s,"Kerja terganggu. Eff semua jabatan turun.","bad");}}
+   ]},
+  {id:"e_slowdown", title:"Ekonomi Slowdown", w:0.8,
+   desc:"Berita ekonomi tak berapa baik. Customer mula berjimat dan tangguh pembelian.",
+   opts:[
+     {label:"Lancar promo & bundle (margin turun, volume naik)", cost:0, fx:s=>{addEffect(s,"Promo Ekonomi",3,{dealMult:0.9, convMult:1.15});}},
+     {label:"Bertahan dengan strategi sedia ada", cost:0, fx:s=>{addEffect(s,"Slowdown",3,{convMult:0.85});}}
+   ]},
+  {id:"e_partner", title:"Peluang: Partnership Strategik", w:0.8,
+   desc:"Syarikat komplementari ajak buat cross-promotion. Mereka ada database customer yang besar.",
+   opts:[
+     {label:"Terima — RM2,000 kos kolaborasi", cost:2000, fx:s=>{addEffect(s,"Cross-Promo",3,{leadsMult:1.35}); log(s,"Partnership aktif! Leads masuk dari database partner.","good");}},
+     {label:"Tolak dengan baik", cost:0, fx:s=>{}}
+   ]},
+  {id:"e_influencer", title:"Peluang: Influencer Nak Collab", w:0.8,
+   desc:"Influencer lokal (450k followers) berminat dengan produk anda. Rate dia RM6,000 untuk 1 campaign.",
+   opts:[
+     {label:"Bayar rate penuh — RM6,000", cost:6000, fx:s=>{const hit=Math.random()<0.75; if(hit){addEffect(s,"Influencer Boost",2,{leadsMult:1.7}); s.rep=clamp(s.rep+5,0,100); log(s,"Campaign meletup! Leads membanjir.","good");}else{addEffect(s,"Influencer Meh",1,{leadsMult:1.1}); log(s,"Campaign okay je. Tak viral macam diharap.","bad");}}},
+     {label:"Counter offer affiliate basis", cost:0, fx:s=>{if(Math.random()<0.4){addEffect(s,"Affiliate Deal",3,{leadsMult:1.25}); log(s,"Influencer setuju affiliate! Win-win.","good");}else{log(s,"Influencer tolak counter offer.","bad");}}}
+   ]},
+  {id:"e_corporate", title:"Peluang: Corporate Client Besar", w:0.7,
+   desc:"Syarikat GLC hantar RFQ. Kalau dapat, ini kontrak terbesar setakat ini. Tapi mereka demand kualiti tinggi.",
+   opts:[
+     {label:"Sediakan proposal premium — RM3,000", cost:3000, fx:s=>{const score=deptScore(s,"operation")+deptScore(s,"sales"); if(score>110||Math.random()<0.35){const v=Math.round(20000+Math.random()*30000); s.pendingRevenue=(s.pendingRevenue||0)+v; log(s,`MENANG TENDER! Kontrak bernilai RM${fmt(v)} masuk bulan depan!`,"gold"); toast("🏆 Menang kontrak korporat!");}else{log(s,"Kalah tender. Operation & Sales perlu lebih kuat untuk client begini.","bad");}}},
+     {label:"Skip. Belum bersedia.", cost:0, fx:s=>{}}
+   ]},
+  {id:"e_poach", title:"Staf Terbaik Kena Poach!", w:0.9, needStaff:true,
+   desc:"Pesaing tawarkan gaji 40% lebih tinggi kepada staf paling berbakat anda.",
+   opts:[
+     {label:"Counter offer (gaji +25%)", cost:0, fx:s=>{const e=bestEmp(s); if(e){e.salary=Math.round(e.salary*1.25); e.loyalty=clamp(e.loyalty+20,0,100); e.morale=clamp(e.morale+15,0,100); log(s,`${e.name} kekal! Gaji naik ke RM${fmt(e.salary)}.`,"good");}}},
+     {label:"Lepaskan. Tiada siapa indispensable.", cost:0, fx:s=>{const e=bestEmp(s); if(e){removeEmp(s,e.id); log(s,`${e.name} resign dan join pesaing. Team terkesan.`,"bad"); moraleAll(s,-8);}}}
+   ]},
+  {id:"e_conflict", title:"Konflik Dalam Team", w:0.9, needStaff:true,
+   desc:"Dua staf bergaduh pasal kerja. Suasana office jadi tegang, productivity jatuh.",
+   opts:[
+     {label:"Mediasi formal melalui HR", cost:0, fx:s=>{if(s.depts.hr.lvl>=3){moraleAll(s,4); log(s,"HR selesaikan dengan profesional. Team makin rapat.","good");}else{moraleAll(s,-3); log(s,"HR cuba selesaikan tapi masih ada ketegangan. HR perlu lebih kuat.","bad");}}},
+     {label:"Biarkan mereka settle sendiri", cost:0, fx:s=>{moraleAll(s,-7); DEPTS.forEach(d=>s.depts[d].eff=clamp(s.depts[d].eff-3,10,100)); log(s,"Konflik merebak. Suasana office toxic.","bad");}}
+   ]},
+  {id:"e_fraud", title:"Kebocoran Wang Dikesan", w:0.5, needStaff:true,
+   desc:"Finance perasan ada transaksi mencurigakan. Ada kemungkinan penyelewengan dalaman.",
+   opts:[
+     {label:"Siasatan penuh + audit dalaman — RM2,000", cost:2000, fx:s=>{const e=lowIntegrityEmp(s); if(e){removeEmp(s,e.id); s.cash-=3000; log(s,`${e.name} didapati menyeleweng RM3,000. Dibuang kerja serta-merta.`,"bad");}else{log(s,"Siasatan clear. False alarm, tapi sistem makin kemas.","good"); s.depts.finance.eff=clamp(s.depts.finance.eff+5,10,100);}}},
+     {label:"Abaikan. Mungkin silap kira.", cost:0, fx:s=>{const e=lowIntegrityEmp(s); if(e){const p=Math.round(4000+Math.random()*8000); s.cash-=p; log(s,`Penyelewengan berterusan. Rugi RM${fmt(p)}.`,"bad");}}}
+   ]},
+  {id:"e_award", title:"Dicalonkan Anugerah SME!", w:0.6,
+   desc:"Syarikat anda dicalonkan untuk anugerah SME tempatan. Majlis gala dinner minggu depan.",
+   opts:[
+     {label:"Hadir penuh gaya — RM1,500", cost:1500, fx:s=>{if(s.rep>50||Math.random()<0.4){s.rep=clamp(s.rep+8,0,100); moraleAll(s,10); log(s,"MENANG ANUGERAH! Team bangga gila.","gold"); toast("🏆 Anugerah SME!");}else{s.rep=clamp(s.rep+3,0,100); log(s,"Tak menang, tapi networking berbaloi.","good");}}},
+     {label:"Skip", cost:0, fx:s=>{}}
+   ]},
+  {id:"e_rentup", title:"Tuan Rumah Naikkan Sewa", w:0.6, minStage:2,
+   desc:"Notis kenaikan sewa 15% diterima.",
+   opts:[
+     {label:"Nego (perlu reputasi)", cost:0, fx:s=>{if(s.rep>=55){log(s,"Nego berjaya! Sewa kekal sebab track record baik.","good");}else{addEffect(s,"Sewa Naik",6,{expFlat:Math.round(STAGES[s.stage].rent*0.15)}); log(s,"Nego gagal. Sewa naik 15% selama 6 bulan.","bad");}}},
+     {label:"Terima", cost:0, fx:s=>{addEffect(s,"Sewa Naik",6,{expFlat:Math.round(STAGES[s.stage].rent*0.15)});}}
+   ]},
+  {id:"e_techdown", title:"Sistem IT Down Seminggu", w:0.7,
+   desc:"Server / laptop utama bermasalah. Kerja tergendala.",
+   opts:[
+     {label:"Panggil IT support segera — RM1,800", cost:1800, fx:s=>{log(s,"Sistem pulih dalam 2 hari.","good");}},
+     {label:"Tunggu & guna workaround", cost:0, fx:s=>{s.depts.admin.eff=clamp(s.depts.admin.eff-10,10,100); s.depts.operation.eff=clamp(s.depts.operation.eff-8,10,100); log(s,"Seminggu kerja terganggu teruk.","bad");}}
+   ]},
+  {id:"e_media", title:"Media Nak Interview Founder", w:0.6,
+   desc:"Portal bisnes tempatan nak feature journey syarikat anda.",
+   opts:[
+     {label:"Terima interview", cost:0, fx:s=>{s.rep=clamp(s.rep+5,0,100); addEffect(s,"Media Feature",2,{leadsMult:1.15}); log(s,"Artikel keluar. Brand awareness naik!","good");}},
+     {label:"Tolak, terlalu sibuk", cost:0, fx:s=>{}}
+   ]}
+];
+
+/* ---------- STATE ---------- */
+const SAVE_KEY = "rodaEmpire_v1";
+let S = null;
+let modalQueue = [];
+
+function defaultState(){
+  const depts = {};
+  DEPTS.forEach(d=>depts[d]={lvl:1, eff:55, health:80});
+  return {
+    month:1, cash:5000, rep:10, stage:1,
+    cumSales:0, cumProfit:0, zakat:0, charity:0,
+    depts, employees:[], candidates:[],
+    upgrades:[], effects:[], feed:[],
+    negMonths:0, lastRev:null, lastProfit:null, lastSat:null,
+    pendingRevenue:0, nextId:1, over:false,
+    milestones:{}, usedDecisions:[]
+  };
+}
+function save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
+function loadSave(){ try{ const r=localStorage.getItem(SAVE_KEY); return r?JSON.parse(r):null; }catch(e){ return null; } }
+function resetGame(){ localStorage.removeItem(SAVE_KEY); S=defaultState(); genCandidates(); document.getElementById("endScreen").classList.remove("show");
+  log(S,"Syarikat baru ditubuhkan. Modal: RM5,000. Jom bina empayar!","gold"); render(); save(); }
+
+/* ---------- HELPERS ---------- */
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const rndi=(a,b)=>Math.round(rnd(a,b));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const fmt=n=>Math.round(n).toLocaleString("en-MY");
+const RM=n=>"RM "+fmt(n);
+
+function log(s,msg,cls){ s.feed.unshift({m:s.month,msg,cls:cls||""}); if(s.feed.length>60)s.feed.length=60; }
+function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg;
+  document.getElementById("toasts").appendChild(t); setTimeout(()=>t.remove(),4200); }
+function addEffect(s,label,months,mods){ s.effects.push({label,monthsLeft:months,mods}); }
+function hasUpg(id){ return S.upgrades.includes(id); }
+function upgMods(key,mode){ // mode: "mult" or "sum"
+  let v = mode==="mult"?1:0;
+  S.upgrades.forEach(id=>{ const u=UPGRADES.find(x=>x.id===id); if(u&&u.mods[key]!=null){ if(mode==="mult")v*=u.mods[key]; else v+=u.mods[key]; } });
+  return v;
+}
+function effectMods(key){ let v=1; S.effects.forEach(e=>{ if(e.mods[key]!=null&&key!=="expFlat"&&key!=="repPerMonth") v*=e.mods[key]; }); return v; }
+function effectSum(key){ let v=0; S.effects.forEach(e=>{ if(e.mods[key]!=null) v+=e.mods[key]; }); return v; }
+
+function deptStaff(s,d){ return s.employees.filter(e=>e.dept===d); }
+function reqStaff(lvl){ return Math.max(0, Math.ceil(lvl*0.5)-1); }
+function deptScore(s,d){
+  const D=s.depts[d], staff=deptStaff(s,d);
+  const avgSkill = staff.length? staff.reduce((a,e)=>a+e.skill,0)/staff.length : 35;
+  const staffing = reqStaff(D.lvl)===0 ? 1 : clamp(staff.length/reqStaff(D.lvl),0,1);
+  return clamp(D.lvl/20*38 + D.eff/100*26 + D.health/100*18 + avgSkill/100*10 + staffing*8, 2, 100);
+}
+function weakestDept(s){ let w=DEPTS[0],ws=999; DEPTS.forEach(d=>{const sc=deptScore(s,d); if(sc<ws){ws=sc;w=d;}}); return w; }
+function balanceInfo(s){
+  const scores={}; DEPTS.forEach(d=>scores[d]=deptScore(s,d));
+  const vals=Object.values(scores), mx=Math.max(...vals), mn=Math.min(...vals), spread=mx-mn;
+  const ease = hasUpg("workflow")?6:0;
+  let mult=1, status="mid", label="TAK SEIMBANG SIKIT";
+  if(spread<=18+ease){ mult=1.25; status="ok"; label="SEIMBANG +25%"; }
+  else if(spread>38+ease){ mult=0.85; status="bad"; label="RODA TEMPANG -15%"; }
+  return {scores,spread,mult,status,label,weakest:weakestDept(s),weakScore:mn};
+}
+function moraleAll(s,v){ s.employees.forEach(e=>e.morale=clamp(e.morale+v,0,100)); }
+function stressAll(s,v){ s.employees.forEach(e=>e.stress=clamp(e.stress+v,0,100)); }
+function moraleDept(s,d,v){ deptStaff(s,d).forEach(e=>e.morale=clamp(e.morale+v,0,100)); }
+function bestEmp(s){ return s.employees.slice().sort((a,b)=>b.skill-a.skill)[0]||null; }
+function lowIntegrityEmp(s){ const l=s.employees.filter(e=>e.integrity<45); return l.length?pick(l):null; }
+function removeEmp(s,id){ s.employees=s.employees.filter(e=>e.id!==id); }
+function totalStaff(){ return S.employees.length; }
+
+/* ---------- CANDIDATES & HIRING ---------- */
+function makeEmp(tierKey,dept){
+  const t=TIERS[tierKey];
+  return { id:S.nextId++, name:pick(NAMES), age:rndi(21,48), dept, tier:tierKey,
+    salary:rndi(t.sal[0],t.sal[1]), skill:rndi(t.skill[0],t.skill[1]), exp:0,
+    loyalty:rndi(40,75), stress:rndi(5,25), morale:rndi(55,80), integrity:rndi(30,95) };
+}
+function genCandidates(){
+  S.candidates=[];
+  const tiers=["junior","junior","exec","exec","manager"];
+  if(S.stage>=3) tiers.push("manager","director");
+  for(let i=0;i<4+Math.min(S.stage,3);i++) S.candidates.push(makeEmp(pick(tiers),pick(DEPTS)));
+}
+function hire(idx){
+  const c=S.candidates[idx]; if(!c) return;
+  const cap=STAGES[S.stage].cap;
+  if(totalStaff()>=cap){ toast("Office penuh! Upgrade pejabat dulu."); return; }
+  const fee=TIERS[c.tier].hireFee;
+  if(S.cash<fee){ toast("Cash tak cukup untuk hiring fee "+RM(fee)); return; }
+  S.cash-=fee; S.candidates.splice(idx,1); S.employees.push(c);
+  log(S,`${c.name} (${TIERS[c.tier].label} ${DEPT_LABEL[c.dept]}) join team. Gaji ${RM(c.salary)}/bln.`,"good");
+  if(!S.milestones.firstHire){ S.milestones.firstHire=true; toast("🎉 Staf pertama anda! Bukan lagi solo founder."); }
+  render(); save();
+}
+function fireEmp(id){
+  const e=S.employees.find(x=>x.id===id); if(!e)return;
+  if(!confirm(`Buang kerja ${e.name}? Severance: ${RM(e.salary)}`))return;
+  S.cash-=e.salary; removeEmp(S,id); moraleAll(S,-4);
+  log(S,`${e.name} diberhentikan. Team sedikit gusar.`,"bad"); render(); save();
+}
+function giveRaise(id){
+  const e=S.employees.find(x=>x.id===id); if(!e)return;
+  const inc=Math.round(e.salary*0.12);
+  e.salary+=inc; e.morale=clamp(e.morale+14,0,100); e.loyalty=clamp(e.loyalty+12,0,100);
+  log(S,`${e.name} dapat kenaikan gaji +${RM(inc)}. Morale naik.`,"good"); render(); save();
+}
+
+/* ---------- DEPT ACTIONS ---------- */
+function lvlCost(lvl){ return Math.round(300*Math.pow(lvl,1.75)); }
+function levelUp(d){
+  const D=S.depts[d]; if(D.lvl>=20){toast("Sudah level maksimum (20).");return;}
+  const c=lvlCost(D.lvl);
+  if(S.cash<c){toast("Cash tak cukup. Perlu "+RM(c));return;}
+  S.cash-=c; D.lvl++; D.eff=clamp(D.eff+4,10,100);
+  log(S,`${DEPT_LABEL[d]} naik ke Level ${D.lvl}.`,"gold"); render(); save();
+}
+function buyUpgrade(id){
+  const u=UPGRADES.find(x=>x.id===id); if(!u||hasUpg(id))return;
+  if(S.depts[u.dept].lvl<u.req){toast(`Perlu ${DEPT_LABEL[u.dept]} Level ${u.req}.`);return;}
+  if(u.reqStage&&S.stage<u.reqStage){toast(`Perlu pejabat Stage ${u.reqStage}.`);return;}
+  if(S.cash<u.cost){toast("Cash tak cukup. Perlu "+RM(u.cost));return;}
+  S.cash-=u.cost; S.upgrades.push(id);
+  if(u.mods.effAll) DEPTS.forEach(d=>S.depts[d].eff=clamp(S.depts[d].eff+u.mods.effAll,10,100));
+  log(S,`Tool baru: ${u.name} (${DEPT_LABEL[u.dept]}). ${u.desc}.`,"gold"); render(); save();
+}
+function upgradeOffice(){
+  if(S.stage>=5){toast("Sudah di Corporate Tower!");return;}
+  const nxt=STAGES[S.stage+1];
+  if(S.cash<nxt.cost){toast("Cash tak cukup. Perlu "+RM(nxt.cost));return;}
+  S.cash-=nxt.cost; S.stage++;
+  moraleAll(S,10);
+  log(S,`PINDAH OFFICE! Selamat datang ke ${nxt.name}. Kapasiti ${nxt.cap} staf. Deal value naik!`,"gold");
+  toast("🏢 Office baru: "+nxt.name); render(); save();
+}
+
+/* ---------- ZAKAT & CHARITY ---------- */
+function payZakat(){ payGive("zakat"); }
+function payCharity(){ payGive("charity"); }
+function payGive(type){
+  const amt=Math.round(Number(document.getElementById("zakatAmt").value)||0);
+  if(amt<100){toast("Masukkan jumlah minimum RM100.");return;}
+  if(amt>S.cash){toast("Cash tak cukup.");return;}
+  S.cash-=amt; S[type]+=amt;
+  S.rep=clamp(S.rep+Math.min(6,amt/8000),0,100); moraleAll(S,Math.min(8,amt/5000));
+  const nm=type==="zakat"?"Zakat":"Sedekah";
+  log(S,`${nm} ${RM(amt)} ditunaikan. Reputasi & morale naik. Total ${nm.toLowerCase()}: ${RM(S[type])}.`,"gold");
+  if(type==="zakat"&&!S.milestones.firstZakat){S.milestones.firstZakat=true;toast("🕌 Zakat pertama syarikat. Moga berkat rezeki.");}
+  if(type==="charity"&&!S.milestones.firstCharity){S.milestones.firstCharity=true;toast("❤️ Sedekah pertama syarikat.");}
+  render(); save();
+}
+
+/* ---------- MONTHLY SIMULATION ---------- */
+function nextMonth(){
+  if(S.over) return;
+  const bal=balanceInfo(S);
+  const M=S.depts.marketing, SL=S.depts.sales, OP=S.depts.operation, FN=S.depts.finance;
+
+  /* -- staffing pressure & efficiency drift -- */
+  const decayMult = hasUpg("meeting")?0.5:1;
+  DEPTS.forEach(d=>{
+    const D=S.depts[d], staff=deptStaff(S,d), need=reqStaff(D.lvl);
+    const avgSkill=staff.length?staff.reduce((a,e)=>a+e.skill,0)/staff.length:35;
+    const target = clamp(38 + avgSkill*0.55 + S.depts.admin.lvl*1.2, 30, 96);
+    if(staff.length<need){
+      D.eff=clamp(D.eff-(4*decayMult),10,100);
+      D.health=clamp(D.health-4,0,100);
+      staff.forEach(e=>e.stress=clamp(e.stress+9,0,100));
+    }else{
+      D.eff += (target-D.eff)*0.25;
+      D.health=clamp(D.health+4,0,100);
+      staff.forEach(e=>e.stress=clamp(e.stress-4,0,100));
+    }
+    if((hasUpg("mktauto")&&d==="marketing")||(hasUpg("opsauto")&&d==="operation")) D.eff=Math.max(D.eff,60);
+    D.eff=clamp(D.eff,10,100);
+  });
+  if(bal.spread>38 && bal.weakest==="admin") DEPTS.forEach(d=>S.depts[d].eff=clamp(S.depts[d].eff-3,10,100));
+
+  /* -- revenue chain -- */
+  let leads = (8 + Math.pow(M.lvl,1.5)*5.5) * (0.4+M.eff/130) * (0.72+S.rep/180) * bal.mult;
+  leads *= upgMods("leadsMult","mult") * effectMods("leadsMult");
+  if(bal.spread>38 && bal.weakest==="marketing") leads*=0.7;
+
+  let conv = (0.14 + SL.lvl*0.012) * (0.5+SL.eff/120) * (0.8+S.rep/250);
+  conv *= upgMods("convMult","mult") * effectMods("convMult");
+  if(bal.spread>38 && bal.weakest==="sales") conv*=0.7;
+  conv=clamp(conv,0.03,0.45);
+
+  const customers = leads*conv;
+  let deal = 900 * STAGES[S.stage].dealMult * (1+OP.lvl*0.025);
+  deal *= upgMods("dealMult","mult") * effectMods("dealMult");
+
+  let revenue = customers*deal;
+  if(S.stage===1 && totalStaff()<=2) revenue += 1700; /* founder side hustle masa kecil */
+  revenue += S.employees.reduce((a,e)=>a+e.skill*(e.morale/100)*11,0); /* team output — staf produktif sumbang revenue */
+  revenue += (S.pendingRevenue||0); const bonusRev=S.pendingRevenue||0; S.pendingRevenue=0;
+
+  /* -- refunds & satisfaction -- */
+  const opsScore=deptScore(S,"operation");
+  let refundRate = clamp(0.02+(62-opsScore)*0.004, 0.01, 0.3) * upgMods("refundMult","mult");
+  if(bal.spread>38 && bal.weakest==="operation") refundRate+=0.08;
+  refundRate=clamp(refundRate,0.005,0.4);
+  const refunds=revenue*refundRate;
+  let sat = clamp(45 + opsScore*0.55 + deptScore(S,"sales")*0.1 - refundRate*120 + upgMods("satFlat","sum"), 5, 100);
+
+  /* -- expenses -- */
+  const payroll=S.employees.reduce((a,e)=>a+e.salary,0);
+  const upkeep=S.upgrades.reduce((a,id)=>a+(UPGRADES.find(u=>u.id===id).upkeep||0),0);
+  let misc=(250+S.stage*180)*upgMods("miscMult","mult")*(1-FN.lvl*0.012);
+  if(bal.spread>38 && bal.weakest==="finance"){ misc*=1.6; if(Math.random()<0.4){const lk=rndi(500,2500); S.cash-=lk; log(S,`Kebocoran kos dikesan: ${RM(lk)}. Finance terlalu lemah.`,"bad");} }
+  const rent=STAGES[S.stage].rent;
+  const expenses=rent+payroll+upkeep+misc+effectSum("expFlat");
+
+  const profit=revenue-refunds-expenses;
+  S.cash+=profit;
+  S.cumSales+=Math.max(0,revenue-refunds);
+  if(profit>0)S.cumProfit+=profit;
+  S.lastRev=revenue-refunds; S.lastProfit=profit; S.lastSat=sat;
+
+  /* -- reputation drift -- */
+  if(S.rep<30)S.rep+=1.1; /* word-of-mouth recovery masa kecil */
+  S.rep=clamp(S.rep+(sat-50)/20+effectSum("repPerMonth"),0,100);
+
+  /* -- employees monthly -- */
+  const trainMult=upgMods("trainMult","mult")||1;
+  const resigned=[];
+  S.employees.forEach(e=>{
+    e.exp++; e.skill=clamp(e.skill+(0.25+S.depts.hr.lvl*0.04)*(trainMult>1?trainMult:1),0,99);
+    let md=(S.depts.hr.lvl*0.5)-(e.stress*0.09)+(profit>0?1:-2.5);
+    if(hasUpg("review")) md=Math.max(md,-1.5);
+    e.morale=clamp(e.morale+md,0,100);
+    e.loyalty=clamp(e.loyalty+(e.morale>60?1:-1.5),0,100);
+    let rc=e.morale<30?0.22:e.morale<50?0.07:0.008;
+    rc*=(1-e.loyalty/180);
+    if(bal.spread>38&&bal.weakest==="hr")rc*=2;
+    if(Math.random()<rc)resigned.push(e);
+  });
+  resigned.forEach(e=>{ removeEmp(S,e.id); log(S,`${e.name} hantar surat resign. (morale rendah)`,"bad"); moraleAll(S,-3); });
+  if(resigned.length&&!S.milestones.firstResign){S.milestones.firstResign=true;toast("💔 Kehilangan staf pertama. Jaga morale team.");}
+
+  /* raise request */
+  const under=S.employees.filter(e=>e.salary < e.skill*55 && e.exp>4 && e.morale<70);
+  if(under.length&&Math.random()<0.35){
+    const e=pick(under);
+    modalQueue.push({type:"event", data:{title:`${e.name} Minta Naik Gaji`, who:"HR",
+      desc:`"${e.name} (skill ${Math.round(e.skill)}) rasa gaji ${RM(e.salary)} dah tak setimpal dengan kerja dia. Dia minta kenaikan 15%."`,
+      opts:[
+        {label:`Lulus kenaikan 15% (+${RM(Math.round(e.salary*0.15))}/bln)`, cost:0, fx:s=>{const ee=s.employees.find(x=>x.id===e.id); if(ee){ee.salary=Math.round(ee.salary*1.15); ee.morale=clamp(ee.morale+16,0,100); ee.loyalty=clamp(ee.loyalty+14,0,100);}}},
+        {label:"Tolak buat masa ini", cost:0, fx:s=>{const ee=s.employees.find(x=>x.id===e.id); if(ee){ee.morale=clamp(ee.morale-14,0,100); ee.loyalty=clamp(ee.loyalty-10,0,100);}}}
+      ]}});
+  }
+
+  /* -- effects tick -- */
+  S.effects.forEach(e=>e.monthsLeft--);
+  S.effects=S.effects.filter(e=>e.monthsLeft>0);
+
+  /* -- month advance & report -- */
+  S.month++;
+  S.negMonths = profit<-300 ? S.negMonths+1 : 0;
+  genCandidates();
+  log(S,`Bulan ${S.month-1} ditutup. Revenue ${RM(revenue-refunds)}, Profit ${profit>=0?"+":""}${RM(profit)}.`, profit>=0?"good":"bad");
+
+  /* milestones */
+  if(S.cumSales>=100000&&!S.milestones.s100k){S.milestones.s100k=true;toast("🔥 RM100,000 cumulative sales!");log(S,"MILESTONE: RM100k sales pertama!","gold");}
+  if(S.cumSales>=1000000&&!S.milestones.s1m){S.milestones.s1m=true;toast("👑 PHASE 1 SIAP: RM1 JUTA SALES!");log(S,"PHASE 1 COMPLETE: RM1,000,000 SALES!","gold");}
+  if(S.cumProfit>=1000000&&!S.milestones.p1m){S.milestones.p1m=true;toast("💰 PHASE 2 SIAP: RM1 JUTA PROFIT!");log(S,"PHASE 2 COMPLETE: RM1,000,000 PROFIT!","gold");}
+  if(S.zakat>=1000000&&!S.milestones.z1m){S.milestones.z1m=true;toast("🕌 PHASE 3 SIAP: RM1 JUTA ZAKAT!");log(S,"PHASE 3 COMPLETE: RM1,000,000 ZAKAT!","gold");}
+  if(S.charity>=1000000&&!S.milestones.c1m){S.milestones.c1m=true;toast("❤️ PHASE 4 SIAP: RM1 JUTA SEDEKAH!");log(S,"PHASE 4 COMPLETE: RM1,000,000 SEDEKAH!","gold");}
+
+  /* -- queue report modal -- */
+  modalQueue.unshift({type:"report", data:{revenue,refunds,bonusRev,expenses,rent,payroll,upkeep,misc:misc+effectSum("expFlat"),profit,leads,conv,customers,sat,bal}});
+
+  /* -- random event + decision -- */
+  const evPool=EVENTS.filter(e=>(!e.needStaff||S.employees.length>0)&&(!e.minStage||S.stage>=e.minStage));
+  if(Math.random()<0.55){ const ev=weightedPick(evPool); modalQueue.push({type:"event", data:ev}); }
+  let dPool=DECISIONS.filter(d=>!S.usedDecisions.slice(-5).includes(d.id));
+  if(!dPool.length)dPool=DECISIONS;
+  const dec=pick(dPool); S.usedDecisions.push(dec.id); if(S.usedDecisions.length>30)S.usedDecisions.shift();
+  modalQueue.push({type:"decision", data:dec});
+
+  checkEnd();
+  render(); save();
+  if(!S.over) showNextModal();
+}
+function weightedPick(pool){
+  const tot=pool.reduce((a,e)=>a+(e.w||1),0); let r=Math.random()*tot;
+  for(const e of pool){ r-=(e.w||1); if(r<=0)return e; } return pool[0];
+}
+
+/* ---------- END CONDITIONS ---------- */
+function checkEnd(){
+  if(S.cash<=0){ endGame(false,"BANKRAP","Cash habis. Tanpa cashflow, tiada syarikat.\nRoda Finance bukan hiasan — dia nyawa bisnes.\n\nBertahan "+(S.month-1)+" bulan."); return; }
+  S.lowRepMonths = (S.rep<10) ? (S.lowRepMonths||0)+1 : 0;
+  if(S.lowRepMonths>=3 && S.month>12){ endGame(false,"REPUTASI MUSNAH","Reputasi jatuh bawah 10. Customer dah tak percaya, talent tak nak join.\n\nBertahan "+(S.month-1)+" bulan."); return; }
+  if(S.negMonths>=6){ endGame(false,"CASHFLOW KRONIK","6 bulan berturut-turut rugi. Bank dah tak layan, supplier dah potong.\n\nBertahan "+(S.month-1)+" bulan."); return; }
+  const collapsed=DEPTS.filter(d=>S.depts[d].health<10).length;
+  if(collapsed>=3 && S.month>6){ endGame(false,"SISTEM RUNTUH","3 jabatan collapse serentak. Bila roda patah ramai-ramai, kereta tak boleh jalan.\n\nBertahan "+(S.month-1)+" bulan."); return; }
+  if(S.cumSales>=1e6&&S.cumProfit>=1e6&&S.zakat>=1e6&&S.charity>=1e6){
+    endGame(true,"EMPAYAR LENGKAP","RM1 juta Sales. RM1 juta Profit. RM1 juta Zakat. RM1 juta Sedekah.\n\nAnda bukan sekadar bina syarikat — anda bina legasi yang seimbang, untung dan memberi.\n\nSiap dalam "+(S.month-1)+" bulan. Byond Success! 👑");
+  }
+}
+function endGame(won,title,desc){
+  S.over=true; save();
+  document.getElementById("endTitle").textContent=title;
+  document.getElementById("endDesc").textContent=desc;
+  document.getElementById("endScreen").classList.add("show");
+}
+
+/* ---------- MODALS ---------- */
+function showNextModal(){
+  const ov=document.getElementById("overlay"), box=document.getElementById("modalBox");
+  if(!modalQueue.length){ ov.classList.remove("show"); render(); save(); return; }
+  const m=modalQueue.shift(); ov.classList.add("show");
+  if(m.type==="report"){
+    const d=m.data, b=d.bal;
+    box.innerHTML=`<span class="tag">Laporan Bulanan — Bulan ${S.month-1}</span>
+      <h3>${d.profit>=0?"BULAN UNTUNG":"BULAN RUGI"}</h3>
+      <div class="report"><table>
+        <tr><td>Leads masuk</td><td>${fmt(d.leads)}</td></tr>
+        <tr><td>Conversion</td><td>${(d.conv*100).toFixed(1)}%</td></tr>
+        <tr><td>Customer baharu</td><td>${fmt(d.customers)}</td></tr>
+        ${d.bonusRev?`<tr><td>Kontrak khas</td><td class="r-gold">+${RM(d.bonusRev)}</td></tr>`:""}
+        <tr><td>Revenue</td><td class="r-gold">${RM(d.revenue)}</td></tr>
+        <tr><td>Refund</td><td class="r-bad">-${RM(d.refunds)}</td></tr>
+        <tr><td>Sewa</td><td>-${RM(d.rent)}</td></tr>
+        <tr><td>Gaji staf</td><td>-${RM(d.payroll)}</td></tr>
+        <tr><td>Tools upkeep</td><td>-${RM(d.upkeep)}</td></tr>
+        <tr><td>Lain-lain</td><td>-${RM(d.misc)}</td></tr>
+        <tr><td><b>PROFIT BERSIH</b></td><td class="${d.profit>=0?"r-good":"r-bad"}"><b>${d.profit>=0?"+":""}${RM(d.profit)}</b></td></tr>
+        <tr><td>Customer satisfaction</td><td>${Math.round(d.sat)}/100</td></tr>
+        <tr><td>Status roda</td><td class="${b.status==="ok"?"r-good":b.status==="bad"?"r-bad":""}">${b.label}</td></tr>
+      </table></div>
+      <div class="opts"><button class="optBtn" onclick="showNextModal()">Teruskan ▶</button></div>`;
+    return;
+  }
+  /* event / decision */
+  const d=m.data;
+  box.innerHTML=`<span class="tag">${m.type==="decision"?"CEO Decision — "+(d.who||""):"Event Bulan Ini"}</span>
+    <h3>${d.title}</h3><p>${d.desc}</p><div class="opts" id="optBox"></div>`;
+  const ob=box.querySelector("#optBox");
+  d.opts.forEach(o=>{
+    const b=document.createElement("button"); b.className="optBtn";
+    b.innerHTML=o.label+(o.cost?`<small>Kos: ${RM(o.cost)}${S.cash<o.cost?" — CASH TAK CUKUP":""}</small>`:"");
+    if(o.cost&&S.cash<o.cost)b.disabled=true;
+    b.onclick=()=>{ if(o.cost)S.cash-=o.cost; o.fx(S); checkEnd(); if(S.over){document.getElementById("overlay").classList.remove("show");render();return;} showNextModal(); };
+    ob.appendChild(b);
+  });
+}
+
+/* ---------- RENDER ---------- */
+function render(){
+  const bal=balanceInfo(S);
+  /* KPIs */
+  document.getElementById("kMonth").textContent=S.month;
+  const kc=document.getElementById("kCash"); kc.textContent=RM(S.cash); kc.className="v "+(S.cash<2000?"neg":"cash");
+  document.getElementById("kRev").textContent=S.lastRev==null?"—":RM(S.lastRev);
+  const kp=document.getElementById("kProfit"); kp.textContent=S.lastProfit==null?"—":(S.lastProfit>=0?"+":"")+RM(S.lastProfit);
+  kp.className="v "+(S.lastProfit==null?"":S.lastProfit>=0?"pos":"neg");
+  document.getElementById("kRep").textContent=Math.round(S.rep);
+  document.getElementById("kStaff").textContent=totalStaff()+"/"+STAGES[S.stage].cap;
+  document.getElementById("kStage").textContent=STAGES[S.stage].name;
+
+  renderWheel(bal); renderAlerts(bal); renderFeed();
+  renderDepts(bal); renderStaff(); renderHire(); renderUpgrades(); renderFinance(); renderMission();
+}
+
+function renderWheel(bal){
+  const svg=document.getElementById("wheelSvg"), cx=210, cy=210, R=150;
+  const pt=(i,r)=>{ const a=-Math.PI/2 + i*Math.PI/3; return [cx+Math.cos(a)*r, cy+Math.sin(a)*r]; };
+  let g="";
+  [0.25,0.5,0.75,1].forEach(f=>{ g+=`<polygon points="${DEPTS.map((_,i)=>pt(i,R*f).join(",")).join(" ")}" fill="none" stroke="#26262B" stroke-width="1"/>`; });
+  DEPTS.forEach((_,i)=>{ const [x,y]=pt(i,R); g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#26262B"/>`; });
+  const pts=DEPTS.map((d,i)=>pt(i,R*bal.scores[d]/100).join(",")).join(" ");
+  const col=bal.status==="ok"?"#3DDC84":bal.status==="bad"?"#FF4D5E":"#FFC400";
+  g+=`<polygon points="${pts}" fill="${col}22" stroke="${col}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  DEPTS.forEach((d,i)=>{
+    const [x,y]=pt(i,R*bal.scores[d]/100);
+    g+=`<circle cx="${x}" cy="${y}" r="4.5" fill="${d===bal.weakest?"#FF4D5E":col}"/>`;
+    const [lx,ly]=pt(i,R+30);
+    g+=`<text x="${lx}" y="${ly}" text-anchor="middle" fill="${d===bal.weakest?"#FF4D5E":"#EDEDEF"}" font-size="15" font-family="'Bebas Neue',Impact,sans-serif" letter-spacing="1.5">${DEPT_LABEL[d]}</text>
+        <text x="${lx}" y="${ly+15}" text-anchor="middle" fill="#8E8E96" font-size="11">${Math.round(bal.scores[d])}</text>`;
+  });
+  g+=`<text x="${cx}" y="${cy+7}" text-anchor="middle" fill="#FFC400" font-size="26" font-family="'Bebas Neue',Impact,sans-serif" letter-spacing="2">BYOND</text>`;
+  svg.innerHTML=g;
+  const bb=document.getElementById("balBadge"); bb.textContent=bal.label; bb.className="balanceBadge "+bal.status;
+  document.getElementById("weakNote").textContent=`Roda paling lemah: ${DEPT_LABEL[bal.weakest]} (${Math.round(bal.weakScore)}) — spread ${Math.round(bal.spread)}`;
+}
+
+function renderAlerts(bal){
+  const el=document.getElementById("alerts"); const a=[];
+  if(S.cash<3000)a.push(["Cash kritikal! "+RM(S.cash)+" sahaja. Bankrap kalau cecah 0.",""]);
+  if(S.negMonths>=2)a.push([`${S.negMonths} bulan berturut rugi. 6 bulan = game over.`,""]);
+  if(S.rep<25)a.push(["Reputasi rendah ("+Math.round(S.rep)+"). Bawah 10 selama 3 bulan berturut = tamat."+(S.lowRepMonths?" ("+S.lowRepMonths+"/3 bulan!)":""),""]);
+  DEPTS.forEach(d=>{ const need=reqStaff(S.depts[d].lvl), have=deptStaff(S,d).length;
+    if(have<need)a.push([`${DEPT_LABEL[d]} kekurangan staf (${have}/${need}). Performance merosot.`,"y"]); });
+  if(bal.status==="bad")a.push([`Roda tempang: ${DEPT_LABEL[bal.weakest]} jauh tertinggal. Penalti aktif.`,""]);
+  const burned=S.employees.filter(e=>e.stress>70).length;
+  if(burned)a.push([`${burned} staf hampir burnout (stress >70). Risiko resign.`,"y"]);
+  S.effects.forEach(e=>a.push([`Aktif: ${e.label} (${e.monthsLeft} bln lagi)`,"y"]));
+  el.innerHTML=a.slice(0,7).map(x=>`<div class="alert ${x[1]}">${x[0]}</div>`).join("")||"";
+}
+function renderFeed(){
+  document.getElementById("feed").innerHTML=S.feed.map(f=>`<div class="${f.cls}"><span class="m">B${f.m}</span>${f.msg}</div>`).join("");
+}
+
+function renderDepts(bal){
+  const g=document.getElementById("deptGrid");
+  g.innerHTML=DEPTS.map(d=>{
+    const D=S.depts[d], sc=Math.round(bal.scores[d]), staff=deptStaff(S,d).length, need=reqStaff(D.lvl);
+    const c=lvlCost(D.lvl);
+    return `<div class="dept ${d===bal.weakest?"weakest":""}">
+      <div class="dh"><span class="dname">${DEPT_LABEL[d]}</span><span class="dlvl">LVL ${D.lvl}</span></div>
+      <div class="meta"><span>${DEPT_DESC[d]}</span><span>Skor: <b style="color:${d===bal.weakest?"var(--bad)":"var(--txt)"}">${sc}</b></span></div>
+      <div class="meta"><span>Efficiency</span><span>${Math.round(D.eff)}</span></div>
+      <div class="bar ${D.eff<35?"low":""}"><i style="width:${D.eff}%"></i></div>
+      <div class="meta"><span>Health</span><span>${Math.round(D.health)}</span></div>
+      <div class="bar h ${D.health<35?"low":""}"><i style="width:${D.health}%"></i></div>
+      <div class="meta"><span>Staf</span><span style="color:${staff<need?"var(--bad)":"var(--good)"}">${staff}/${need}</span></div>
+      <div class="acts"><button class="btn gold" onclick="levelUp('${d}')" ${D.lvl>=20?"disabled":""}>${D.lvl>=20?"MAX":"Naik Level — "+RM(c)}</button></div>
+    </div>`;
+  }).join("");
+}
+
+function renderStaff(){
+  document.getElementById("staffCapNote").textContent=`kapasiti office: ${totalStaff()}/${STAGES[S.stage].cap}`;
+  const g=document.getElementById("empGrid");
+  if(!S.employees.length){g.innerHTML=`<div class="empty">Belum ada staf. Anda solo founder buat masa ini — pergi ke tab HIRING.</div>`;return;}
+  g.innerHTML=S.employees.map(e=>`<div class="emp">
+    <div class="eh"><div><div class="nm">${e.name}, ${e.age}</div><div class="rl">${TIERS[e.tier].label} — ${DEPT_LABEL[e.dept]}</div></div>
+    <div style="font-family:var(--display);font-size:17px;color:var(--yellow)">${RM(e.salary)}</div></div>
+    <div class="stats">
+      <span>Skill <b>${Math.round(e.skill)}</b></span><span>Exp <b>${e.exp} bln</b></span>
+      <span>Morale <b style="color:${e.morale<40?"var(--bad)":e.morale>70?"var(--good)":"var(--txt)"}">${Math.round(e.morale)}</b></span>
+      <span>Stress <b style="color:${e.stress>70?"var(--bad)":"var(--txt)"}">${Math.round(e.stress)}</b></span>
+      <span>Loyalty <b>${Math.round(e.loyalty)}</b></span><span>Integrity <b style="color:${e.integrity<45?"var(--bad)":"var(--txt)"}">${Math.round(e.integrity)}</b></span>
+    </div>
+    ${e.morale<40?`<div class="warn">⚠ Morale rendah — risiko resign</div>`:""}
+    ${e.stress>70?`<div class="warn">⚠ Hampir burnout</div>`:""}
+    <div class="acts" style="margin-top:8px">
+      <button class="btn" onclick="giveRaise(${e.id})">Naik Gaji +12%</button>
+      <button class="btn red" onclick="fireEmp(${e.id})">Buang Kerja</button>
+    </div></div>`).join("");
+}
+
+function renderHire(){
+  const g=document.getElementById("hireGrid");
+  g.innerHTML=S.candidates.map((c,i)=>`<div class="emp">
+    <div class="eh"><div><div class="nm">${c.name}, ${c.age}</div><div class="rl">${TIERS[c.tier].label} — ${DEPT_LABEL[c.dept]}</div></div>
+    <div style="font-family:var(--display);font-size:17px;color:var(--yellow)">${RM(c.salary)}<span style="font-size:11px;color:var(--mut)">/bln</span></div></div>
+    <div class="stats"><span>Skill <b>${Math.round(c.skill)}</b></span><span>Integrity <b style="color:${c.integrity<45?"var(--bad)":"var(--txt)"}">${Math.round(c.integrity)}</b></span></div>
+    <div class="acts" style="margin-top:8px"><button class="btn gold" onclick="hire(${i})">Hire — fee ${RM(TIERS[c.tier].hireFee)}</button></div>
+  </div>`).join("")||`<div class="empty">Tiada calon. Post job ad untuk refresh.</div>`;
+}
+
+function renderUpgrades(){
+  const el=document.getElementById("upgList");
+  el.innerHTML=DEPTS.map(d=>{
+    const list=UPGRADES.filter(u=>u.dept===d);
+    return `<h2 style="margin-top:10px;font-size:16px">${DEPT_LABEL[d]}</h2>`+list.map(u=>{
+      const owned=hasUpg(u.id), locked=S.depts[d].lvl<u.req||(u.reqStage&&S.stage<u.reqStage);
+      return `<div class="upgRow"><div><div class="ui-n">${u.name}</div><div class="ui-d">${u.desc}${u.upkeep?` · upkeep ${RM(u.upkeep)}/bln`:""} · perlu Lvl ${u.req}${u.reqStage?` + office Stage ${u.reqStage}`:""}</div></div>
+        ${owned?`<span class="owned">✔ AKTIF</span>`:`<button class="btn ${locked?"":"gold"}" onclick="buyUpgrade('${u.id}')" ${locked?"disabled":""}>${RM(u.cost)}</button>`}</div>`;
+    }).join("");
+  }).join("");
+}
+
+function renderFinance(){
+  const payroll=S.employees.reduce((a,e)=>a+e.salary,0);
+  const upkeep=S.upgrades.reduce((a,id)=>a+(UPGRADES.find(u=>u.id===id).upkeep||0),0);
+  document.getElementById("finReport").innerHTML=`<table>
+    <tr><td>Cash di tangan</td><td class="r-gold">${RM(S.cash)}</td></tr>
+    <tr><td>Komitmen bulanan (sewa+gaji+upkeep)</td><td class="r-bad">-${RM(STAGES[S.stage].rent+payroll+upkeep)}</td></tr>
+    <tr><td>Cumulative Sales</td><td>${RM(S.cumSales)}</td></tr>
+    <tr><td>Cumulative Profit</td><td>${RM(S.cumProfit)}</td></tr>
+    <tr><td>Total Zakat</td><td>${RM(S.zakat)}</td></tr>
+    <tr><td>Total Sedekah</td><td>${RM(S.charity)}</td></tr>
+  </table>`;
+  const nxt=S.stage<5?STAGES[S.stage+1]:null;
+  document.getElementById("officePanel").innerHTML = nxt
+    ? `<div class="upgRow"><div><div class="ui-n">Upgrade ke ${nxt.name}</div><div class="ui-d">Kapasiti ${nxt.cap} staf · sewa ${RM(nxt.rent)}/bln · deal value x${nxt.dealMult}</div></div>
+       <button class="btn gold" onclick="upgradeOffice()">${RM(nxt.cost)}</button></div>`
+    : `<div class="empty">Corporate Tower — tahap tertinggi dicapai. 🏙</div>`;
+}
+
+function renderMission(){
+  const ph=[
+    {n:1,t:"RM1,000,000 SALES",v:S.cumSales},
+    {n:2,t:"RM1,000,000 PROFIT",v:S.cumProfit},
+    {n:3,t:"RM1,000,000 ZAKAT",v:S.zakat},
+    {n:4,t:"RM1,000,000 SEDEKAH",v:S.charity}
+  ];
+  let prevDone=true;
+  document.getElementById("phaseList").innerHTML=ph.map(p=>{
+    const done=p.v>=1e6, locked=!prevDone&&!done, pct=clamp(p.v/1e6*100,0,100);
+    const html=`<div class="phase ${done?"done":""} ${locked?"locked":""}">
+      <div class="ph"><span>PHASE ${p.n} — ${p.t}</span><span>${done?"✔ SIAP":Math.floor(pct)+"%"}</span></div>
+      <div class="bar ${done?"h":""}"><i style="width:${pct}%"></i></div>
+      <div class="meta" style="font-size:11px;color:var(--mut)">${RM(p.v)} / RM 1,000,000${locked?" · (fokus phase sebelum ini dulu)":""}</div>
+    </div>`;
+    prevDone=prevDone&&done; return html;
+  }).join("");
+}
+
+/* ---------- WIRING ---------- */
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".tabPane").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  document.getElementById("pane-"+t.dataset.tab).classList.add("active");
+}));
+document.getElementById("nextBtn").addEventListener("click",nextMonth);
+document.getElementById("newGameBtn").addEventListener("click",()=>{ if(confirm("Mula syarikat baru? Save lama akan dipadam."))resetGame(); });
+document.getElementById("refreshCand").addEventListener("click",()=>{ if(S.cash<300){toast("Cash tak cukup.");return;} S.cash-=300; genCandidates(); render(); save(); });
+document.getElementById("payZakat").addEventListener("click",payZakat);
+document.getElementById("payCharity").addEventListener("click",payCharity);
+
+/* ---------- BOOT ---------- */
+(function boot(){
+  const saved=loadSave();
+  if(saved&&saved.depts){ S=saved; if(S.over){document.getElementById("endScreen").classList.add("show");
+    document.getElementById("endTitle").textContent="GAME TAMAT";
+    document.getElementById("endDesc").textContent="Save lama ini sudah berakhir. Mula semula untuk bina empayar baru.";} }
+  else { S=defaultState(); genCandidates();
+    log(S,"Selamat datang, Founder. Modal RM5,000, home office, dan 6 roda kosong. Phase 1: RM1 juta sales.","gold"); }
+  if(!S.candidates||!S.candidates.length) genCandidates();
+  render(); save();
+})();
+</script>
+</body>
+</html>
